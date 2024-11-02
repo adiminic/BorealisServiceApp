@@ -8,12 +8,8 @@ const RoutesPage = () => {
     return(
     <>
     <Routes>
-        <Route path={StepRoute.home}>
-            <HomePage />
-        </Route>
-        <Route path={StepRoute.configureService}>
-            <ConfigureServicePage />
-        </Route>
+        <Route path={StepRoute.home} element={<HomePage />} />
+        <Route path={StepRoute.configureService} element={<ConfigureServicePage />} />
     </Routes>
     </>
     )
