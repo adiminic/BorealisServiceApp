@@ -1,5 +1,7 @@
+@import url('/src/assets/satoshi_font/css/satoshi.css');
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Satoshi-Regular, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -65,4 +67,8 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 }
