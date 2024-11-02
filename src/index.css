@@ -37,6 +37,7 @@ h1 {
   line-height: 1.1;
 }
 
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -48,6 +49,30 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+primary-button {
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px 0px 50px;
+gap: 50px;
+
+width: 2699px;
+height: 440px;
+
+background: #FFFFFF;
+border: 1px solid #D2D2D2;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+}
+
 button:hover {
   border-color: #646cff;
 }
