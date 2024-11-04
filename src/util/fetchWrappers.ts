@@ -1,4 +1,5 @@
-import { ApiError } from "../models/ResponseWrapper/ApiError";
+
+import { ApiError } from "../models/ApiError/ApiError";
 import { ResponseWrapper } from "../models/ResponseWrapper/ResponseWrapper";
 
 type FetchOptions = {
@@ -36,19 +37,12 @@ type FetchOptions = {
       const data = await response.json();
 
       if (!response.ok) {
-        // throw new ApiErrorAe("left", "right");
-        const res: ResponseWrapper<T> = {
-          success: false,
-          result: {} as T,
-          error: data as ApiError
-        }
-        return res;
+        throw new ApiError(data.message, data.cause);
       }
 
       const res: ResponseWrapper<T> = {
         success: true,
-        result: data as T,
-        error: {} as ApiError
+        result: data as T
       }
       return res;
     } catch (error) {

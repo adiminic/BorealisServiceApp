@@ -1,4 +1,4 @@
-export class ApiErrorAe extends Error {
+export class ApiError extends Error {
     cause: string;
 
     constructor(message: string, cause: string) {
