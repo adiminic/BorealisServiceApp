@@ -1,16 +1,23 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Manufacturer } from "../../models/response/Manufacturer";
-import { Service } from "../../models/response/Service";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { PromoCode } from "../../models/response/PromoCode";
 import { ServiceContext } from "../../context/ServiceContext";
 import NavBar from "../../components/NavBar";
 import "./ConfigureServicePage.css";
-import { Button, Checkbox, CheckboxOptionType, Col, Radio, Row } from "antd";
+import { Button, Checkbox, Col, Input, Row, Tag } from "antd";
+import FormItem from "antd/es/form/FormItem";
+import TextArea from "antd/es/input/TextArea";
+import checkmarkIcon from "../../assets/checkmark icon.svg";
+import { validatePromoCode } from "../../service/BorealisService";
+import { ApiError } from "../../models/ApiError/ApiError";
+import { Service } from "../../models/response/Service";
+import { FullServiceData } from "../../models/FullServiceData/FullServiceData";
+import { useNavigate } from "react-router-dom";
+import { StepRoute } from "../../util/constants";
 
 type Inputs = {
-  manufacturer: Manufacturer;
-  services: Service[];
+  manufacturer: string;
+  services: string[];
   promoCode: string;
   name: string;
   contactNumber: string;
@@ -20,61 +27,78 @@ type Inputs = {
 
 const ConfigureServicePage: React.FC = () => {
   const serviceCtx = useContext(ServiceContext);
+  const navigate = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number>(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [validPromoCode, setValidPromoCode] = useState<PromoCode>();
+  const [showCodeInput, setShowCodeInput] = useState<boolean>(false);
+  const [showCodeError, setShowCodeError] = useState<string>("");
+
+  const idsToServices = useCallback(
+    (ids: string[]): Service[] => {
+      return serviceCtx.services!.filter((s) => ids.includes(s.id));
+    },
+    [serviceCtx.services]
+  );
 
   const {
+    control,
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const fullServiceData: FullServiceData = {
+      manufacturer: serviceCtx.manufacturers!.filter(
+        (m) => m.id == data.manufacturer
+      )[0],
+      services: idsToServices(data.services),
+      promoCode: validPromoCode,
+      name: data.name,
+      contactNumber: data.contactNumber,
+      email: data.email,
+      remark: data.remark,
+    };
+    serviceCtx.setServiceData(fullServiceData);
+    navigate(StepRoute.confirmService);
+  };
 
-  const servicesField: Service[] = watch("services");
+  const servicesField: string[] = watch("services");
 
   useEffect(() => {
-    console.log("rerender");
-    if (
-      servicesField == undefined ||
-      servicesField.length == 0 ||
-      validPromoCode == undefined
-    ) {
+    if (servicesField == undefined || servicesField.length == 0) {
       setTotalAmount(0);
     } else {
-      setTotalAmount(
-        servicesField.reduce((sum, service) => {
-          return sum + service.price;
-        }, 0) *
-          (1 -
-            (validPromoCode?.discountPercentage
-              ? validPromoCode?.discountPercentage
-              : 0))
-      );
+      const flteredServices = idsToServices(servicesField);
+      const servicesTotal = flteredServices.reduce((sum, service) => {
+        return sum + service.price;
+      }, 0);
+
+      const discount =
+        validPromoCode != undefined && validPromoCode.discountPercentage > 0
+          ? 1 - validPromoCode!.discountPercentage
+          : 1;
+      setTotalAmount(servicesTotal * discount);
     }
-  }, [servicesField, validPromoCode]);
+  }, [idsToServices, servicesField, validPromoCode]);
 
-  // async function handleCouponRedeem() {
-  //   const promoCode = watch("promoCode");
-  //   try {
-  //     const res = await validatePromoCode(promoCode);
-  //     if (res.success) {
-  //       setValidPromoCode(res.result);
-  //     }
-  //   } catch (e) {
-  //     //handle error
-  //     console.log(e);
-  //   }
-  //   return;
-  // }
+  async function handleCouponRedeem() {
+    setShowCodeError("");
+    const promoCode = watch("promoCode");
+    try {
+      const res = await validatePromoCode(promoCode);
+      if (res.success) {
+        setValidPromoCode(res.result);
+      }
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setShowCodeError(e.message);
+      }
+    }
+  }
 
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-
-  const handleChange = (checkedValues: string[]) => {
-    setSelectedServices(checkedValues);
-  };
   return (
     <>
       <NavBar />
@@ -87,14 +111,14 @@ const ConfigureServicePage: React.FC = () => {
             <label className="form-section-text">
               Odaberite proizvođača vašeg vozila
             </label>
-            <div className="form-section-body">
+            {/* <div className="form-section-body">
               <Radio.Group {...register("manufacturer")}>
                 <Row gutter={[10, 10]}>
                   {serviceCtx.manufacturers!.map((m) => (
                     <Col span={8} key={m.id} className="radio-button">
                       <Radio
                         className="radio-button-label"
-                        value={m.name}
+                        value={m.id}
                         id={m.id}
                       >
                         {m.name}
@@ -103,14 +127,14 @@ const ConfigureServicePage: React.FC = () => {
                   ))}
                 </Row>
               </Radio.Group>
-            </div>
-            {/* <div className="form-section-body">
+            </div> */}
+            <div className="form-section-body">
               {serviceCtx.manufacturers?.map((option) => (
-                <div className="radio-button">
+                <div className="radio-button" key={option.id}>
                   <input
                     className="radio-button-default radio-button-input"
                     type="radio"
-                    value={option.name}
+                    value={option.id}
                     id={option.id}
                     {...register("manufacturer")}
                   />
@@ -119,29 +143,27 @@ const ConfigureServicePage: React.FC = () => {
                   </label>
                 </div>
               ))}
-            </div> */}
+            </div>
           </div>
           {/* <div className="form-section">
             <label className="form-section-text">
               Odaberite jednu ili više usluga koje trebate
             </label>
             <div className="form-section-body">
-              <select {...register("services")}>
-                {serviceCtx.services?.map((option) => (
-                  <div className="checkbox">
-                    <input
-                      className="checkbox-input"
-                      type="radio"
-                      value={option.name}
-                      id={option.id}
-                      {...register("manufacturer")}
-                    />
-                    <label className="checkbox-label" htmlFor={option.id}>
-                      {option.name}
-                    </label>
-                  </div>
-                ))}
-              </select>
+              {serviceCtx.services?.map((option) => (
+                <div className="checkbox">
+                  <input
+                    className="checkbox-input"
+                    type="checkbox"
+                    value={option.name}
+                    id={option.id}
+                    {...register("services")}
+                  />
+                  <label className="checkbox-label" htmlFor={option.id}>
+                    {option.name}
+                  </label>
+                </div>
+              ))}
             </div>
           </div> */}
           <div>
@@ -150,61 +172,167 @@ const ConfigureServicePage: React.FC = () => {
                 <label className="form-section-text">
                   Odaberite jednu ili više usluga koje trebate
                 </label>
-                <Checkbox.Group
-                  onChange={handleChange}
-                  className="form-section-body"
-                >
-                  <Row>
-                    {serviceCtx.services.map((service) => (
-                      <Col key={service.id} className="checkbox">
-                        <Checkbox
-                          value={service.id}
-                          className="checkbox-label custom-checkbox"
-                        >
-                          {service.name}(${service.price}€)
-                        </Checkbox>
-                      </Col>
-                    ))}
-                  </Row>
-                </Checkbox.Group>
+                <Controller
+                  name="services"
+                  control={control}
+                  defaultValue={[]}
+                  render={({ field }) => (
+                    <Checkbox.Group className="form-section-body" {...field}>
+                      <Row>
+                        {serviceCtx.services!.map((service) => (
+                          <Col key={service.id} className="checkbox">
+                            <Checkbox
+                              value={service.id}
+                              className="checkbox-label custom-checkbox"
+                            >
+                              {service.name}(${service.price}€)
+                            </Checkbox>
+                          </Col>
+                        ))}
+                      </Row>
+                    </Checkbox.Group>
+                  )}
+                ></Controller>
               </div>
             )}
           </div>
-          <div>
+          <div className="form-section">
+            <div className="form-section-total-amount">
+              <div>
+                <span className="total-amount-label">Ukupno:</span>
+                <span className="total-amount">{`${totalAmount}€`}</span>
+              </div>
+              <div>
+                {showCodeInput ? (
+                  <div>
+                    <div style={{ display: "flex" }}>
+                      <Controller
+                        name="promoCode"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => <Input {...field} />}
+                      />
+                      <button
+                        className="square-button"
+                        onClick={handleCouponRedeem}
+                      >
+                        <img src={checkmarkIcon} alt="checkmark icon"></img>
+                      </button>
+                    </div>
+                    {validPromoCode != undefined && (
+                      <div style={{ display: "flex", padding: "5px" }}>
+                        <Tag>{validPromoCode.code}</Tag>
+                      </div>
+                    )}
+                    {showCodeError != "" && (
+                      <div style={{ display: "flex", padding: "5px" }}>
+                        <span className="code-error-label">
+                          {showCodeError}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <a
+                      className="promo-code-anchor"
+                      onClick={() => setShowCodeInput(true)}
+                    >
+                      Imam kod
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="form-section">
             <h4 className="form-section-text">Vaši podaci</h4>
-            <div>
-              <div>
-                <label>Ime i prezime:</label>
-                <input {...register("name", { required: true })} />
-                {errors.name && <p>{errors.name.message}</p>}
-              </div>
-              <div>
-                <label>Phone:</label>
-                <input {...register("contactNumber")} />
-                {errors.contactNumber && <p>{errors.contactNumber.message}</p>}
-              </div>
-            </div>
-            <div>
-              <label>Email:</label>
-              <input {...register("email")} />
-              {errors.email && <p>{errors.email.message}</p>}
-            </div>
-            <div>
-              <label>Text:</label>
-              <textarea {...register("remark")} />
-              {errors.remark && <p>{errors.remark.message}</p>}
-            </div>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <Controller
+                  name="name"
+                  control={control}
+                  defaultValue=""
+                  rules={{ required: "Ime i prezime su obavezni!" }}
+                  render={({ field }) => (
+                    <FormItem
+                      label="Ime i prezime"
+                      validateStatus={errors.name ? "error" : ""}
+                      help={errors.name?.message}
+                    >
+                      <Input {...field} />
+                    </FormItem>
+                  )}
+                />
+              </Col>
+              <Col span={12}>
+                <Controller
+                  name="contactNumber"
+                  control={control}
+                  defaultValue=""
+                  rules={{ required: "Broj telefona je obavezan!" }}
+                  render={({ field }) => (
+                    <FormItem
+                      label="Broj telefona"
+                      validateStatus={errors.contactNumber ? "error" : ""}
+                      help={errors.contactNumber?.message}
+                    >
+                      <Input {...field} />
+                    </FormItem>
+                  )}
+                />
+              </Col>
+            </Row>
+            <Row gutter={[16, 16]} style={{ width: "100%" }}>
+              <Col span={24}>
+                <Controller
+                  name="email"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: "Email adresa je obavezan!",
+                    pattern: {
+                      value: /^\S+@\S+$/,
+                      message: "Invalid email address",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <FormItem
+                      layout="vertical"
+                      label="Email adresa"
+                      validateStatus={errors.email ? "error" : ""}
+                      help={errors.email?.message}
+                    >
+                      <Input {...field} />
+                    </FormItem>
+                  )}
+                />
+              </Col>
+            </Row>
+            <Row gutter={[16, 16]} style={{ width: "100%" }}>
+              <Col span={24}>
+                <Controller
+                  name="remark"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <FormItem layout="vertical" label="Napomena (opcionalno)">
+                      <TextArea {...field} />
+                    </FormItem>
+                  )}
+                />
+              </Col>
+            </Row>
+            <FormItem style={{ width: "100%" }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ width: "100%" }}
+              >
+                Dalje
+              </Button>
+            </FormItem>
           </div>
-          <div>
-            <input {...register("promoCode")} disabled />
-            <button type="button"></button>
-            {errors.promoCode && <p>{errors.promoCode.message}</p>}
-          </div>
-          <div>
-            <label>Total Amount:</label>
-            <input type="number" value={totalAmount} disabled />
-          </div>
-          <button type="submit">Submit</button>
         </form>
       </div>
     </>
