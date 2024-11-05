@@ -14,6 +14,7 @@ import { Service } from "../../models/response/Service";
 import { FullServiceData } from "../../models/FullServiceData/FullServiceData";
 import { useNavigate } from "react-router-dom";
 import { StepRoute } from "../../util/constants";
+import ErrorPage from "../ErrorPage/ErrorPage";
 
 export type Inputs = {
   manufacturer: string;
@@ -29,7 +30,6 @@ const ConfigureServicePage: React.FC = () => {
   const serviceCtx = useContext(ServiceContext);
   const navigate = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [validPromoCode, setValidPromoCode] = useState<PromoCode>();
   const [showCodeInput, setShowCodeInput] = useState<boolean>(false);
   const [showCodeError, setShowCodeError] = useState<string>("");
@@ -110,7 +110,8 @@ const ConfigureServicePage: React.FC = () => {
     }
   }
 
-  return (
+  return serviceCtx.manufacturers != undefined &&
+    serviceCtx.services != undefined ? (
     <>
       <NavBar />
       <div className="configure-page-container">
@@ -347,6 +348,8 @@ const ConfigureServicePage: React.FC = () => {
         </form>
       </div>
     </>
+  ) : (
+    <ErrorPage />
   );
 };
 
