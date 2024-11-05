@@ -67,4 +67,18 @@ body{height:100vh;}
   font-weight: 700;
   font-size: 32px;
   line-height: 41.6px;
+  color: var(--color-base-100);
+}
+
+.form-title-text-bold-primary {
+  font-family: 'Satoshi-Variable';
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 41.6px;
+  color: var(--color-primary-100);
+}
+
+.main-image {
+  width: 60px;
+  height: 60px;
 }

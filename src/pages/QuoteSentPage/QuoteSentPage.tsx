@@ -8,10 +8,10 @@ const QuoteSentPage: React.FC = () => {
       <NavBar />
       <div className="main-container">
         <div className="home-container">
-          <img src={successIcon} alt="success icon" />
-          <h1 className="text-xl font-bold">
+          <img className="main-image" src={successIcon} alt="success icon" />
+          <span className="text-xl font-bold">
             Vaša prijava je uspješno poslana
-          </h1>
+          </span>
           <p className="text-m">
             Vaša prijava je uspješno poslana i zaprimljena. Kontaktirat ćemo vas
             u najkraćem mogućem roku.

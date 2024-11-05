@@ -52,12 +52,14 @@ const HomePage: React.FC = () => {
       <NavBar />
       <div className="main-container">
         <div className="home-container">
-          <img src={toolsIcon} alt="tools icon" />
-          <h1 className="text-xl font-bold">Konfigurator servisa</h1>
-          <p className="text-m">
+          <img className="main-image" src={toolsIcon} alt="tools icon" />
+          <span className="form-title-text-bold-primary">
+            Konfigurator servisa
+          </span>
+          <span className="body-text">
             Pošaljite upit za servis svog vozila pomoću našeg konfiguratora i
             naš stučan tim će vam se javiti u najkraćem mogućem roku.
-          </p>
+          </span>
           <button className="primary-button" onClick={nextAction}>
             Pokreni konfigurator
           </button>
