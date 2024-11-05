@@ -11,9 +11,13 @@ const ErrorPage: React.FC = () => {
       <NavBar />
       <div className="main-container">
         <div className="home-container">
-          <img src={toolsIcon} alt="success icon" />
-          <h1 className="text-xl font-bold">Ups! Imamo tehničkih poteškoća</h1>
-          <p className="text-m">Možete pokušati ponovo malo kasnije.</p>
+          <img className="main-image" src={toolsIcon} alt="success icon" />
+          <span className="form-title-text-bold-primary">
+            Ups! Imamo tehničkih poteškoća
+          </span>
+          <span className="body-text">
+            Možete pokušati ponovo malo kasnije.
+          </span>
           <button
             className="primary-button"
             onClick={() => navigate(StepRoute.home)}
