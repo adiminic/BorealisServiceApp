@@ -1,7 +1,6 @@
 import React from "react";
 import NavBar from "../../components/NavBar";
 import successIcon from "../../assets/success-icon.svg";
-import "./QuoteSentPage.css";
 
 const QuoteSentPage: React.FC = () => {
   return (
