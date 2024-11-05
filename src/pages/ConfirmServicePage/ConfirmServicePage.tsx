@@ -7,10 +7,22 @@ import { StepRoute } from "../../util/constants";
 import { getQuote } from "../../service/BorealisService";
 import { ServiceData } from "../../models/request/ServiceData";
 import { ApiError } from "../../models/ApiError/ApiError";
+import ErrorPage from "../ErrorPage/ErrorPage";
 
 const ConfirmServicePage: React.FC = () => {
   const serviceCtx = useContext(ServiceContext);
   const navigate = useNavigate();
+
+  function formatPhoneNumber(phoneNumber: string | undefined): string {
+    // Ensure the input is a string of 10 digits
+    if (phoneNumber == undefined) return "";
+    const cleaned = ("" + phoneNumber).replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `${match[1]} ${match[2]} ${match[3]}`;
+    }
+    return phoneNumber;
+  }
 
   const nextAction = async () => {
     const body: ServiceData = {
@@ -32,12 +44,12 @@ const ConfirmServicePage: React.FC = () => {
     }
   };
 
-  return (
+  return serviceCtx.serviceData != undefined ? (
     <>
       <NavBar />
       <div className="configure-page-container">
         <div className="form-title-section">
-          <h2 className="form-title-text-bold">Konfigurator Servisa</h2>
+          <span className="form-title-text-bold">Konfigurator Servisa</span>
         </div>
         <div className="form-section">
           <label className="form-section-text">
@@ -55,12 +67,12 @@ const ConfirmServicePage: React.FC = () => {
             <div className="bg-div">
               <label className="form-section-text">Model vozila</label>
               <span className="section-text">
-                {serviceCtx.serviceData?.manufacturer.name}
+                {serviceCtx.serviceData.manufacturer.name}
               </span>
             </div>
             <div className="bg-div">
               <label className="form-section-text">Odabrane usluge</label>
-              {serviceCtx.serviceData?.services.map((s) => (
+              {serviceCtx.serviceData.services.map((s) => (
                 <div className="service-div" key={s.id}>
                   <span className="section-text">{s.name}</span>
                   <span className="section-text">{`${s.price.toFixed(
@@ -68,49 +80,57 @@ const ConfirmServicePage: React.FC = () => {
                   )} €`}</span>
                 </div>
               ))}
-              {serviceCtx.serviceData?.promoCode && (
+              {serviceCtx.serviceData.promoCode && (
                 <div className="total-amount-div">
                   <span className="section-text-gray">
                     {`Popust ${
-                      serviceCtx.serviceData?.promoCode.discountPercentage * 100
+                      serviceCtx.serviceData.promoCode.discountPercentage * 100
                     }%:`}
                   </span>
-                  <span className="section-text-gray">{`${(
-                    -serviceCtx.serviceData?.totalAmount *
-                    serviceCtx.serviceData?.promoCode.discountPercentage
+                  <span className="section-text">{`${(
+                    -serviceCtx.serviceData.totalAmount *
+                    serviceCtx.serviceData.promoCode.discountPercentage
                   ).toFixed(2)} €`}</span>
                 </div>
               )}
               <div className="total-amount-div">
-                <span className="section-text">Ukupno:</span>
-                <span className="section-text-blue">{`${serviceCtx.serviceData?.totalAmount.toFixed(
+                <span className="section-text-gray">Ukupno:</span>
+                <span className="section-text-blue">{`${serviceCtx.serviceData.totalAmount.toFixed(
                   2
                 )} €`}</span>
               </div>
               <div className="bg-div">
                 <label className="form-section-text">Kontakt podaci</label>
                 <div className="contact-div">
-                  <span className="section-text w-[110px]">Ime i prezime:</span>
-                  <span className="section-text w-[385px]">
-                    {serviceCtx.serviceData?.name}
+                  <span className="section-text-gray width-contact-key">
+                    Ime i prezime:
+                  </span>
+                  <span className="section-text width-contact-value">
+                    {serviceCtx.serviceData.name}
                   </span>
                 </div>
                 <div className="contact-div">
-                  <span className="section-text w-[110px]">Email adresa:</span>
-                  <span className="section-text w-[385px]">
-                    {serviceCtx.serviceData?.email}
+                  <span className="section-text-gray width-contact-key">
+                    Email adresa:
+                  </span>
+                  <span className="section-text width-contact-value">
+                    {serviceCtx.serviceData.email}
                   </span>
                 </div>
                 <div className="contact-div">
-                  <span className="section-text w-[110px]">Broj telefona:</span>
-                  <span className="section-text w-[385px]">
-                    {serviceCtx.serviceData?.contactNumber}
+                  <span className="section-text-gray width-contact-key">
+                    Broj telefona:
+                  </span>
+                  <span className="section-text width-contact-value">
+                    {formatPhoneNumber(serviceCtx.serviceData.contactNumber)}
                   </span>
                 </div>
                 <div className="contact-div">
-                  <span className="section-text w-[110px]">Napomena:</span>
-                  <span className="section-text w-[385px]">
-                    {serviceCtx.serviceData?.remark}
+                  <span className="section-text-gray width-contact-key">
+                    Napomena:
+                  </span>
+                  <span className="section-text width-contact-value">
+                    {serviceCtx.serviceData.remark}
                   </span>
                 </div>
               </div>
@@ -130,6 +150,8 @@ const ConfirmServicePage: React.FC = () => {
         </div>
       </div>
     </>
+  ) : (
+    <ErrorPage />
   );
 };
 
