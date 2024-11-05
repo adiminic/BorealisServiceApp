@@ -15,14 +15,14 @@ import { FullServiceData } from "../../models/FullServiceData/FullServiceData";
 import { useNavigate } from "react-router-dom";
 import { StepRoute } from "../../util/constants";
 
-type Inputs = {
+export type Inputs = {
   manufacturer: string;
   services: string[];
   promoCode: string;
   name: string;
-  contactNumber: string;
+  phoneNumber: string;
   email: string;
-  remark: string;
+  note: string;
 };
 
 const ConfigureServicePage: React.FC = () => {
@@ -33,6 +33,8 @@ const ConfigureServicePage: React.FC = () => {
   const [validPromoCode, setValidPromoCode] = useState<PromoCode>();
   const [showCodeInput, setShowCodeInput] = useState<boolean>(false);
   const [showCodeError, setShowCodeError] = useState<string>("");
+  const defaultValues =
+    serviceCtx.confFormData != undefined ? serviceCtx.confFormData : {};
 
   const idsToServices = useCallback(
     (ids: string[]): Service[] => {
@@ -41,13 +43,23 @@ const ConfigureServicePage: React.FC = () => {
     [serviceCtx.services]
   );
 
+  const calculateTotalCost = useCallback(
+    (ids: string[]) => {
+      const flteredServices = idsToServices(ids);
+      return flteredServices.reduce((sum, service) => {
+        return sum + service.price;
+      }, 0);
+    },
+    [idsToServices]
+  );
+
   const {
     control,
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({ defaultValues });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const fullServiceData: FullServiceData = {
@@ -57,11 +69,13 @@ const ConfigureServicePage: React.FC = () => {
       services: idsToServices(data.services),
       promoCode: validPromoCode,
       name: data.name,
-      contactNumber: data.contactNumber,
+      contactNumber: data.phoneNumber,
       email: data.email,
-      remark: data.remark,
+      remark: data.note,
+      totalAmount: calculateTotalCost(data.services),
     };
     serviceCtx.setServiceData(fullServiceData);
+    serviceCtx.setConfFormData(data);
     navigate(StepRoute.confirmService);
   };
 
@@ -71,10 +85,7 @@ const ConfigureServicePage: React.FC = () => {
     if (servicesField == undefined || servicesField.length == 0) {
       setTotalAmount(0);
     } else {
-      const flteredServices = idsToServices(servicesField);
-      const servicesTotal = flteredServices.reduce((sum, service) => {
-        return sum + service.price;
-      }, 0);
+      const servicesTotal = calculateTotalCost(servicesField);
 
       const discount =
         validPromoCode != undefined && validPromoCode.discountPercentage > 0
@@ -82,7 +93,7 @@ const ConfigureServicePage: React.FC = () => {
           : 1;
       setTotalAmount(servicesTotal * discount);
     }
-  }, [idsToServices, servicesField, validPromoCode]);
+  }, [calculateTotalCost, idsToServices, servicesField, validPromoCode]);
 
   async function handleCouponRedeem() {
     setShowCodeError("");
@@ -267,15 +278,15 @@ const ConfigureServicePage: React.FC = () => {
               </Col>
               <Col span={12}>
                 <Controller
-                  name="contactNumber"
+                  name="phoneNumber"
                   control={control}
                   defaultValue=""
                   rules={{ required: "Broj telefona je obavezan!" }}
                   render={({ field }) => (
                     <FormItem
                       label="Broj telefona"
-                      validateStatus={errors.contactNumber ? "error" : ""}
-                      help={errors.contactNumber?.message}
+                      validateStatus={errors.phoneNumber ? "error" : ""}
+                      help={errors.phoneNumber?.message}
                     >
                       <Input {...field} />
                     </FormItem>
@@ -312,7 +323,7 @@ const ConfigureServicePage: React.FC = () => {
             <Row gutter={[16, 16]} style={{ width: "100%" }}>
               <Col span={24}>
                 <Controller
-                  name="remark"
+                  name="note"
                   control={control}
                   defaultValue=""
                   render={({ field }) => (
