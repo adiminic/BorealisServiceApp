@@ -1,0 +1,200 @@
+.configure-page-container {
+    margin: 0 auto;
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.form-title-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 30px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-top: 40px;
+    gap: 10;
+}
+
+.form-title-text-bold {
+    font-family: 'Satoshi-Variable';
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 41.6px;
+}
+
+.form-section {
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 20px;
+    gap: 10;
+}
+
+.form-section-text {
+    font-family: 'Satoshi-Variable';
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 25.2px;
+    color: var(--color-primary-100);
+}
+
+.form-section-text-bg {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-right: 30px;
+    padding-bottom: 20px;
+    gap: 10;
+}
+
+.top-section-text {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: left;
+}
+
+.section-text {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: left;
+}
+
+.section-text-blue {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: left;
+    color: var(--color-primary-100);
+}
+
+.section-text-gray {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: left;
+    color: var(--color-base-200);
+}
+
+.form-section-background {
+    height:fit-content;
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    justify-content:space-between;
+    background-color: var(--color-bg-200);
+    border-radius: 5px;
+}
+
+.bg-div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width:100%;
+    padding-top: 20px;
+    border-bottom: 1px;
+}
+
+.service-div {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    padding: 5px;
+    border-bottom: 1px solid gainsboro;
+    gap: 5px;
+    height: 34px;
+}
+
+.total-amount-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width:100%;
+    padding: 5px;
+    gap: 20px;
+}
+
+.contact-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width:100%;
+    gap: 5px;
+}
+
+.buttons-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width:100%;
+    height: 55px;
+    gap: 20px;
+    padding-right: 30px;
+    padding-left: 30px;
+    padding-bottom: 20px;
+}
+
+.back-button {
+    width: 81px;
+    height: 35px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border: 1px solid var(--color-base-200);
+    border-radius: 3px;
+    padding-right: 15px;
+    padding-left: 15px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    gap: 10px;
+ }
+
+ .back-text {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 25.2px;
+    color: var(--color-base-100);
+}
+ 
+ .send-button {
+    width: 439px;
+    height: 35px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    background-color: var(--color-primary-100);
+    border-radius: 3px;
+    border-color: var(--color-primary-100);
+    padding-right: 15px;
+    padding-left: 15px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    gap: 10px;
+ } 
+
+ .send-text {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 25.2px;
+    color: var(--color-base-600);
+}

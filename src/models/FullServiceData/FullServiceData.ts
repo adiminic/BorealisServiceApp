@@ -10,4 +10,5 @@ export type FullServiceData = {
     contactNumber: string;
     email: string;
     remark: string;
+    totalAmount: number;
 }
