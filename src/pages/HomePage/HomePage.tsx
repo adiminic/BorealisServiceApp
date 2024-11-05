@@ -27,10 +27,9 @@ const HomePage: React.FC = () => {
         }
       } catch (e) {
         if (e instanceof ApiError) {
-          //set message and cause to context
+          console.log(e.message);
+          navigate(StepRoute.error);
         }
-        serviceCtx.setIsError(true);
-        //TODO show error page
       }
     }
     if (serviceCtx.services == undefined || serviceCtx.services.length == 0) {
@@ -41,10 +40,9 @@ const HomePage: React.FC = () => {
         }
       } catch (e) {
         if (e instanceof ApiError) {
-          //set message and cause to context
+          console.log(e.message);
+          navigate(StepRoute.error);
         }
-        serviceCtx.setIsError(true);
-        //TODO show error page
       }
     }
     navigate(StepRoute.configureService);

@@ -27,6 +27,7 @@ const ConfirmServicePage: React.FC = () => {
     } catch (e) {
       if (e instanceof ApiError) {
         console.log(e.message);
+        navigate(StepRoute.error);
       }
     }
   };

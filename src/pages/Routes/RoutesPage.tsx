@@ -4,6 +4,7 @@ import ConfigureServicePage from "../ConfigureServicePage/ConfigureServicePage";
 import { StepRoute } from "../../util/constants";
 import ConfirmServicePage from "../ConfirmServicePage/ConfirmServicePage";
 import QuoteSentPage from "../QuoteSentPage/QuoteSentPage";
+import ErrorPage from "../ErrorPage/ErrorPage";
 
 const RoutesPage = () => {
   return (
@@ -19,6 +20,7 @@ const RoutesPage = () => {
           element={<ConfirmServicePage />}
         />
         <Route path={StepRoute.quoteSent} element={<QuoteSentPage />} />
+        <Route path={StepRoute.error} element={<ErrorPage />} />
         <Route path="*" element={<Navigate to={StepRoute.home} replace />} />
       </Routes>
     </>
