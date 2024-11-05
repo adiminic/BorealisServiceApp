@@ -1,0 +1,33 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height:100vh;
+}
+
+.home-container {
+    margin: 0 auto;
+    padding: 30px;
+    gap: 20px;
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.primary-button {
+    width: 190px;
+    height: 35px;
+    padding: 5px 15px;
+    gap: 5px;
+    border-radius: 3px 3px 3px 3px;
+    background-color: var(--color-primary-100);
+    font-family: 'Satoshi-Variable';
+    color: white;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 25.2px;
+}
+
+
