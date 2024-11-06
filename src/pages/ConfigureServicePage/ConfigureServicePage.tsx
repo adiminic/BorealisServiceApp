@@ -315,7 +315,7 @@ const ConfigureServicePage: React.FC = () => {
                       className="promo-code-anchor"
                       onClick={() => setShowCodeInput(true)}
                     >
-                      Imam kod
+                      <span className="promo-code-label-blue">Imam kupon</span>
                     </a>
                   </div>
                 )}

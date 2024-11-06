@@ -115,6 +115,14 @@
     color: var(--color-primary-100);
 }
 
+.promo-code-label-blue {
+    font-family: 'Satoshi-Variable';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--color-primary-100);
+}
+
 .custom-checkbox .ant-checkbox-inner {
     width: 16px;
     height: 16px;
