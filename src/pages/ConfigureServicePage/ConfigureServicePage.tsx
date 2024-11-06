@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { PromoCode } from "../../models/response/PromoCode";
 import { ServiceContext } from "../../context/ServiceContext";
@@ -34,8 +34,19 @@ const ConfigureServicePage: React.FC = () => {
   const [validPromoCode, setValidPromoCode] = useState<PromoCode>();
   const [showCodeInput, setShowCodeInput] = useState<boolean>(false);
   const [showCodeError, setShowCodeError] = useState<string>("");
+  const [errorFadeOut, setErrorFadeOut] = useState(false);
   const defaultValues =
     serviceCtx.confFormData != undefined ? serviceCtx.confFormData : {};
+
+  useEffect(() => {
+    if (errorFadeOut) {
+      const timer = setTimeout(() => {
+        setShowCodeError("");
+        setErrorFadeOut(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorFadeOut]);
 
   const idsToServices = (ids: string[]): Service[] => {
     return serviceCtx.services!.filter((s) => ids.includes(s.id));
@@ -100,7 +111,8 @@ const ConfigureServicePage: React.FC = () => {
     //promoCode active but checkCode button is clicked
     if (validPromoCode != undefined) {
       setShowCodeError("Samo jedan kod može biti aktivan!");
-      return;
+      const timer = setTimeout(() => setErrorFadeOut(true), 3000);
+      return () => clearTimeout(timer);
     }
     try {
       const res = await validatePromoCode(promoCode);
@@ -254,7 +266,13 @@ const ConfigureServicePage: React.FC = () => {
                     )}
                     {showCodeError != "" && (
                       <div className="promo-code-tab-error">
-                        <span className="code-error-label">
+                        <span
+                          className={
+                            errorFadeOut
+                              ? "fade-out code-error-label"
+                              : "code-error-label"
+                          }
+                        >
                           {showCodeError}
                         </span>
                       </div>

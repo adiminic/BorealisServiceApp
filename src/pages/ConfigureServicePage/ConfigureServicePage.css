@@ -213,3 +213,17 @@
     line-height: 25.2px;
     color: var(--color-base-600);
 }
+
+.fade-out {
+    animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
