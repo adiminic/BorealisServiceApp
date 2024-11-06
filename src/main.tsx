@@ -19,14 +19,17 @@ const router = createBrowserRouter([
   {
     path: StepRoute.home,
     element: <HomePage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: StepRoute.configureService,
     element: <ConfigureServicePage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: StepRoute.confirmService,
     element: <ConfirmServicePage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: StepRoute.quoteSent,

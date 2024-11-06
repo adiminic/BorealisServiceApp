@@ -10,7 +10,7 @@
   --color-base-200: #585757;
   --color-base-300: #969696;
   --color-base-400: #000000;
-  --color-base-500: #000000;
+  --color-base-500: rgba(0, 0, 0, 0.04);
   --color-base-600: #FFFFFF;
 
   /* Primary Colors */

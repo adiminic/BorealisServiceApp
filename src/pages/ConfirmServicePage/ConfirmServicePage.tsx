@@ -28,8 +28,13 @@ const ConfirmServicePage: React.FC = () => {
     const body: ServiceData = {
       manufacturerId: serviceCtx.confFormData!.manufacturer,
       serviceIds: serviceCtx.confFormData!.services,
+      promoCode: serviceCtx.serviceData?.promoCode
+        ? serviceCtx.serviceData?.promoCode?.code
+        : "",
       fullName: serviceCtx.confFormData!.name,
-      ...serviceCtx.confFormData!,
+      email: serviceCtx.confFormData!.email,
+      phoneNumber: serviceCtx.confFormData!.phoneNumber,
+      note: serviceCtx.confFormData!.note,
     };
     try {
       const res = await getQuote(body);
@@ -83,13 +88,12 @@ const ConfirmServicePage: React.FC = () => {
               {serviceCtx.serviceData.promoCode && (
                 <div className="total-amount-div">
                   <span className="section-text-gray">
-                    {`Popust ${
-                      serviceCtx.serviceData.promoCode.discountPercentage * 100
-                    }%:`}
+                    {`Popust ${serviceCtx.serviceData.promoCode.discountPercentage}%:`}
                   </span>
                   <span className="section-text">{`${(
-                    -serviceCtx.serviceData.totalAmount *
-                    serviceCtx.serviceData.promoCode.discountPercentage
+                    (-serviceCtx.serviceData.totalPrice *
+                      serviceCtx.serviceData.promoCode.discountPercentage) /
+                    100
                   ).toFixed(2)} €`}</span>
                 </div>
               )}
