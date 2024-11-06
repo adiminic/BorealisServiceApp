@@ -28,9 +28,9 @@ const ConfirmServicePage: React.FC = () => {
     const body: ServiceData = {
       manufacturerId: serviceCtx.confFormData!.manufacturer,
       serviceIds: serviceCtx.confFormData!.services,
-      promoCode: serviceCtx.serviceData?.promoCode
-        ? serviceCtx.serviceData?.promoCode?.code
-        : "",
+      ...(serviceCtx.serviceData?.promoCode !== undefined && {
+        promoCode: serviceCtx.serviceData.promoCode.code,
+      }),
       fullName: serviceCtx.confFormData!.name,
       email: serviceCtx.confFormData!.email,
       phoneNumber: serviceCtx.confFormData!.phoneNumber,
