@@ -1,10 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { PromoCode } from "../../models/response/PromoCode";
 import { ServiceContext } from "../../context/ServiceContext";
 import NavBar from "../../components/NavBar";
 import "./ConfigureServicePage.css";
-import { Button, Checkbox, Col, Input, Row, Tag } from "antd";
+import { Checkbox, Col, Input, Radio, Row, Tag } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import TextArea from "antd/es/input/TextArea";
 import checkmarkIcon from "../../assets/checkmark icon.svg";
@@ -29,6 +29,7 @@ export type Inputs = {
 const ConfigureServicePage: React.FC = () => {
   const serviceCtx = useContext(ServiceContext);
   const navigate = useNavigate();
+  const [totalPrice, setTotalPrice] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [validPromoCode, setValidPromoCode] = useState<PromoCode>();
   const [showCodeInput, setShowCodeInput] = useState<boolean>(false);
@@ -36,28 +37,41 @@ const ConfigureServicePage: React.FC = () => {
   const defaultValues =
     serviceCtx.confFormData != undefined ? serviceCtx.confFormData : {};
 
-  const idsToServices = useCallback(
-    (ids: string[]): Service[] => {
-      return serviceCtx.services!.filter((s) => ids.includes(s.id));
-    },
-    [serviceCtx.services]
-  );
+  const idsToServices = (ids: string[]): Service[] => {
+    return serviceCtx.services!.filter((s) => ids.includes(s.id));
+  };
 
-  const calculateTotalCost = useCallback(
-    (ids: string[]) => {
-      const flteredServices = idsToServices(ids);
-      return flteredServices.reduce((sum, service) => {
+  const calculateTotalCost = (ids: string[]) => {
+    const flteredServices = idsToServices(ids);
+    setTotalPrice(
+      flteredServices.reduce((sum, service) => {
         return sum + service.price;
-      }, 0);
-    },
-    [idsToServices]
-  );
+      }, 0)
+    );
+  };
+
+  const calculateTotalAmount = (checkedServices?: string[]): void => {
+    //calculate total price of all services
+    if (checkedServices == undefined || checkedServices.length == 0) {
+      setTotalAmount(0);
+      return;
+    } else if (checkedServices) {
+      calculateTotalCost(checkedServices);
+    }
+    // calculate discount
+    let discount: number = 1;
+    if (validPromoCode != undefined && validPromoCode.discountPercentage > 0) {
+      discount = 1 - validPromoCode!.discountPercentage;
+    }
+    //combine into total amount
+    setTotalAmount(totalPrice * discount);
+  };
 
   const {
     control,
-    register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>({ defaultValues });
 
@@ -72,42 +86,41 @@ const ConfigureServicePage: React.FC = () => {
       contactNumber: data.phoneNumber,
       email: data.email,
       remark: data.note,
-      totalAmount: calculateTotalCost(data.services),
+      totalAmount: totalAmount,
     };
     serviceCtx.setServiceData(fullServiceData);
     serviceCtx.setConfFormData(data);
     navigate(StepRoute.confirmService);
   };
 
-  const servicesField: string[] = watch("services");
-
-  useEffect(() => {
-    if (servicesField == undefined || servicesField.length == 0) {
-      setTotalAmount(0);
-    } else {
-      const servicesTotal = calculateTotalCost(servicesField);
-
-      const discount =
-        validPromoCode != undefined && validPromoCode.discountPercentage > 0
-          ? 1 - validPromoCode!.discountPercentage
-          : 1;
-      setTotalAmount(servicesTotal * discount);
-    }
-  }, [calculateTotalCost, idsToServices, servicesField, validPromoCode]);
-
   async function handleCouponRedeem() {
     setShowCodeError("");
     const promoCode = watch("promoCode");
+
+    //promoCode active but checkCode button is clicked
+    if (validPromoCode != undefined) {
+      setShowCodeError("Samo jedan kod može biti aktivan!");
+      return;
+    }
     try {
       const res = await validatePromoCode(promoCode);
       if (res.success) {
         setValidPromoCode(res.result);
+        calculateTotalAmount();
       }
     } catch (e) {
       if (e instanceof ApiError) {
         setShowCodeError(e.message);
       }
+    } finally {
+      setValue("promoCode", "");
     }
+  }
+
+  function removePromoCode(): void {
+    setShowCodeError("");
+    setValidPromoCode(undefined);
+    calculateTotalAmount();
   }
 
   return serviceCtx.manufacturers != undefined &&
@@ -119,28 +132,39 @@ const ConfigureServicePage: React.FC = () => {
           <h2 className="form-title-text-bold">Konfigurator Servisa</h2>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="form-section">
-            <label className="form-section-text">
-              Odaberite proizvođača vašeg vozila
-            </label>
-            {/* <div className="form-section-body">
-              <Radio.Group {...register("manufacturer")}>
-                <Row gutter={[10, 10]}>
-                  {serviceCtx.manufacturers!.map((m) => (
-                    <Col span={8} key={m.id} className="radio-button">
-                      <Radio
-                        className="radio-button-label"
-                        value={m.id}
-                        id={m.id}
-                      >
-                        {m.name}
-                      </Radio>
-                    </Col>
-                  ))}
-                </Row>
-              </Radio.Group>
-            </div> */}
-            <div className="form-section-body">
+          {serviceCtx.manufacturers != undefined && (
+            <div className="form-section">
+              <label className="form-section-text">
+                Odaberite proizvođača vašeg vozila
+              </label>
+              <Controller
+                name="manufacturer"
+                control={control}
+                defaultValue={""}
+                rules={{
+                  required: "Odaberite proizvođača vozila!",
+                }}
+                render={({ field }) => (
+                  <Radio.Group {...field} className="form-section-body">
+                    <Row gutter={[10, 10]}>
+                      {serviceCtx.manufacturers!.map((m) => (
+                        <Col span={8} key={m.id} className="radio-button">
+                          <Radio
+                            className="radio-button-label radio-button-default radio-button-input"
+                            value={m.id}
+                            id={m.id}
+                          >
+                            {m.name}
+                          </Radio>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Radio.Group>
+                )}
+              ></Controller>
+            </div>
+          )}
+          {/* <div className="form-section-body">
               {serviceCtx.manufacturers?.map((option) => (
                 <div className="radio-button" key={option.id}>
                   <input
@@ -156,28 +180,7 @@ const ConfigureServicePage: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
-          {/* <div className="form-section">
-            <label className="form-section-text">
-              Odaberite jednu ili više usluga koje trebate
-            </label>
-            <div className="form-section-body">
-              {serviceCtx.services?.map((option) => (
-                <div className="checkbox">
-                  <input
-                    className="checkbox-input"
-                    type="checkbox"
-                    value={option.name}
-                    id={option.id}
-                    {...register("services")}
-                  />
-                  <label className="checkbox-label" htmlFor={option.id}>
-                    {option.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div> */}
+          </div>*/}
           <div>
             {serviceCtx.services && (
               <div className="form-section">
@@ -188,6 +191,9 @@ const ConfigureServicePage: React.FC = () => {
                   name="services"
                   control={control}
                   defaultValue={[]}
+                  rules={{
+                    required: "Odaberite barem jednu uslugu!",
+                  }}
                   render={({ field }) => (
                     <Checkbox.Group className="form-section-body" {...field}>
                       <Row>
@@ -196,8 +202,10 @@ const ConfigureServicePage: React.FC = () => {
                             <Checkbox
                               value={service.id}
                               className="checkbox-label custom-checkbox"
+                              onChange={() => calculateTotalAmount(field.value)}
                             >
-                              {service.name}(${service.price}€)
+                              {service.name}
+                              <span className="checkbox-label-blue">{` (${service.price}€)`}</span>
                             </Checkbox>
                           </Col>
                         ))}
@@ -222,7 +230,13 @@ const ConfigureServicePage: React.FC = () => {
                         name="promoCode"
                         control={control}
                         defaultValue=""
-                        render={({ field }) => <Input {...field} />}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            disabled={validPromoCode != undefined}
+                            onChange={() => setShowCodeError("")}
+                          />
+                        )}
                       />
                       <button
                         className="square-button"
@@ -232,12 +246,14 @@ const ConfigureServicePage: React.FC = () => {
                       </button>
                     </div>
                     {validPromoCode != undefined && (
-                      <div style={{ display: "flex", padding: "5px" }}>
-                        <Tag>{validPromoCode.code}</Tag>
+                      <div className="promo-code-tab-error">
+                        <Tag closable onClose={removePromoCode}>
+                          {validPromoCode.code}
+                        </Tag>
                       </div>
                     )}
                     {showCodeError != "" && (
-                      <div style={{ display: "flex", padding: "5px" }}>
+                      <div className="promo-code-tab-error">
                         <span className="code-error-label">
                           {showCodeError}
                         </span>
@@ -272,7 +288,7 @@ const ConfigureServicePage: React.FC = () => {
                       validateStatus={errors.name ? "error" : ""}
                       help={errors.name?.message}
                     >
-                      <Input {...field} />
+                      <Input {...field} placeholder="Unesite ime i prezime" />
                     </FormItem>
                   )}
                 />
@@ -289,7 +305,7 @@ const ConfigureServicePage: React.FC = () => {
                       validateStatus={errors.phoneNumber ? "error" : ""}
                       help={errors.phoneNumber?.message}
                     >
-                      <Input {...field} />
+                      <Input {...field} placeholder="Unesite broj telefona" />
                     </FormItem>
                   )}
                 />
@@ -302,10 +318,10 @@ const ConfigureServicePage: React.FC = () => {
                   control={control}
                   defaultValue=""
                   rules={{
-                    required: "Email adresa je obavezan!",
+                    required: "Email adresa je obavezna!",
                     pattern: {
                       value: /^\S+@\S+$/,
-                      message: "Invalid email address",
+                      message: "Email nije ispravnog oblika!",
                     },
                   }}
                   render={({ field }) => (
@@ -315,7 +331,7 @@ const ConfigureServicePage: React.FC = () => {
                       validateStatus={errors.email ? "error" : ""}
                       help={errors.email?.message}
                     >
-                      <Input {...field} />
+                      <Input {...field} placeholder="Unesite email adresu" />
                     </FormItem>
                   )}
                 />
@@ -329,20 +345,20 @@ const ConfigureServicePage: React.FC = () => {
                   defaultValue=""
                   render={({ field }) => (
                     <FormItem layout="vertical" label="Napomena (opcionalno)">
-                      <TextArea {...field} />
+                      <TextArea {...field} placeholder="Unesite napomenu" />
                     </FormItem>
                   )}
                 />
               </Col>
             </Row>
+            /* TODO remove this style */
             <FormItem style={{ width: "100%" }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{ width: "100%" }}
+              <button
+                className="send-button send-text"
+                onClick={handleSubmit(onSubmit)}
               >
                 Dalje
-              </Button>
+              </button>
             </FormItem>
           </div>
         </form>
