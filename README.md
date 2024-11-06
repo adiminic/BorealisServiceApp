@@ -1,6 +1,6 @@
 # React + TypeScript + Vite
 
-This is a simple React application powered by Vite for fast development and optimized build.
+This is a simple React application for booking car service, created as interview assignment powered by Vite for fast development and optimized build.
 
 ## Prerequisites
 - **Node.js** (v18.18 or later)
