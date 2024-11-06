@@ -250,77 +250,80 @@ const ConfigureServicePage: React.FC = () => {
                     {errors.services.message}
                   </span>
                 )}
-              </div>
-            )}
-          </div>
-          <div className="form-section">
-            <div className="form-section-total-amount">
-              <div>
-                <span className="total-amount-label">Ukupno:</span>
-                <span className="total-amount">{`${totalAmount.toFixed(
-                  2
-                )}€`}</span>
-              </div>
-              <div>
-                {showCodeInput || validPromoCode != undefined ? (
-                  <div style={{ display: "flex" }} className="promo-code-div">
-                    <div style={{ display: "flex" }}>
-                      <Controller
-                        name="promoCode"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            disabled={validPromoCode != undefined}
-                            onChange={(e) => {
-                              setShowCodeError("");
-                              field.onChange(e.target.value);
-                            }}
-                          />
-                        )}
-                      />
-                      <button
-                        className="square-button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleCouponRedeem();
-                        }}
+                <div className="form-section-total-amount">
+                  <div>
+                    <span className="total-amount-label">ukupno:</span>
+                    <span className="total-amount">{`${totalAmount
+                      .toFixed(2)
+                      .replace(".", ",")}€`}</span>
+                  </div>
+                  <div>
+                    {showCodeInput || validPromoCode != undefined ? (
+                      <div
+                        style={{ display: "flex" }}
+                        className="promo-code-div"
                       >
-                        <img src={checkmarkIcon} alt="checkmark icon"></img>
-                      </button>
-                    </div>
-                    {validPromoCode != undefined && (
-                      <Tag closable onClose={removePromoCode}>
-                        {validPromoCode.code}
-                      </Tag>
-                    )}
-                    {showCodeError != "" && (
-                      <div className="promo-code-tab-error">
-                        <span
-                          className={
-                            errorFadeOut
-                              ? "fade-out code-error-label"
-                              : "code-error-label"
-                          }
+                        <div style={{ display: "flex" }}>
+                          <Controller
+                            name="promoCode"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <Input
+                                {...field}
+                                disabled={validPromoCode != undefined}
+                                onChange={(e) => {
+                                  setShowCodeError("");
+                                  field.onChange(e.target.value);
+                                }}
+                              />
+                            )}
+                          />
+                          <button
+                            className="square-button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleCouponRedeem();
+                            }}
+                          >
+                            <img src={checkmarkIcon} alt="checkmark icon"></img>
+                          </button>
+                        </div>
+                        {validPromoCode != undefined && (
+                          <Tag closable onClose={removePromoCode}>
+                            {validPromoCode.code}
+                          </Tag>
+                        )}
+                        {showCodeError != "" && (
+                          <div className="promo-code-tab-error">
+                            <span
+                              className={
+                                errorFadeOut
+                                  ? "fade-out code-error-label"
+                                  : "code-error-label"
+                              }
+                            >
+                              {showCodeError}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <a
+                          className="promo-code-anchor"
+                          onClick={() => setShowCodeInput(true)}
                         >
-                          {showCodeError}
-                        </span>
+                          <span className="promo-code-label-blue">
+                            Imam kupon
+                          </span>
+                        </a>
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div>
-                    <a
-                      className="promo-code-anchor"
-                      onClick={() => setShowCodeInput(true)}
-                    >
-                      <span className="promo-code-label-blue">Imam kupon</span>
-                    </a>
-                  </div>
-                )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="form-section">
             <h4 className="form-section-text">Vaši podaci</h4>
@@ -334,6 +337,7 @@ const ConfigureServicePage: React.FC = () => {
                   render={({ field }) => (
                     <FormItem
                       label="Ime i prezime"
+                      labelCol={{ className: "input-name-label" }}
                       validateStatus={errors.email ? "error" : ""}
                       help={
                         errors.name && (
@@ -346,7 +350,7 @@ const ConfigureServicePage: React.FC = () => {
                       <Input
                         {...field}
                         placeholder="Unesite ime i prezime"
-                        className="custom-bg"
+                        className="custom-bg input-label"
                       />
                     </FormItem>
                   )}
@@ -359,14 +363,19 @@ const ConfigureServicePage: React.FC = () => {
                   defaultValue=""
                   rules={{
                     required: "Broj telefona je obavezan!",
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Broj telefona može sadržavati samo brojeve!",
+                    validate: {
+                      isNumber: (value) =>
+                        /^[0-9]+$/.test(value) ||
+                        "Broj telefona može sadržavati samo brojeve!",
+                      isTenDigits: (value) =>
+                        /^[0-9]{10}$/.test(value) ||
+                        "Broj telefona mora imati točno 10 brojeva!",
                     },
                   }}
                   render={({ field }) => (
                     <FormItem
                       label="Broj telefona"
+                      labelCol={{ className: "input-name-label" }}
                       validateStatus={errors.email ? "error" : ""}
                       help={
                         errors.phoneNumber && (
@@ -379,7 +388,7 @@ const ConfigureServicePage: React.FC = () => {
                       <Input
                         {...field}
                         placeholder="Unesite broj telefona"
-                        className="custom-bg"
+                        className="custom-bg input-label"
                       />
                     </FormItem>
                   )}
@@ -403,6 +412,7 @@ const ConfigureServicePage: React.FC = () => {
                     <FormItem
                       layout="vertical"
                       label="Email adresa"
+                      labelCol={{ className: "input-name-label" }}
                       validateStatus={errors.email ? "error" : ""}
                       help={
                         errors.email && (
@@ -415,7 +425,7 @@ const ConfigureServicePage: React.FC = () => {
                       <Input
                         {...field}
                         placeholder="Unesite email adresu"
-                        className="custom-bg"
+                        className="custom-bg input-label"
                       />
                     </FormItem>
                   )}
@@ -429,17 +439,23 @@ const ConfigureServicePage: React.FC = () => {
                   control={control}
                   defaultValue=""
                   render={({ field }) => (
-                    <FormItem layout="vertical" label="Napomena (opcionalno)">
+                    <FormItem
+                      layout="vertical"
+                      label="Napomena (opcionalno)"
+                      labelCol={{ className: "input-name-label" }}
+                    >
                       <TextArea
                         {...field}
                         placeholder="Unesite napomenu"
-                        className="custom-bg"
+                        className="custom-bg input-label"
                       />
                     </FormItem>
                   )}
                 />
               </Col>
             </Row>
+          </div>
+          <div className="form-section">
             <Row style={{ width: "100%" }}>
               <Col span={24}>
                 <FormItem>

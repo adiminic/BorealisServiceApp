@@ -80,9 +80,9 @@ const ConfirmServicePage: React.FC = () => {
               {serviceCtx.serviceData.services.map((s) => (
                 <div className="service-div" key={s.id}>
                   <span className="section-text">{s.name}</span>
-                  <span className="section-text">{`${s.price.toFixed(
-                    2
-                  )} €`}</span>
+                  <span className="section-text">{`${s.price
+                    .toFixed(2)
+                    .replace(".", ",")} €`}</span>
                 </div>
               ))}
               {serviceCtx.serviceData.promoCode && (
@@ -94,14 +94,16 @@ const ConfirmServicePage: React.FC = () => {
                     (-serviceCtx.serviceData.totalPrice *
                       serviceCtx.serviceData.promoCode.discountPercentage) /
                     100
-                  ).toFixed(2)} €`}</span>
+                  )
+                    .toFixed(2)
+                    .replace(".", ",")} €`}</span>
                 </div>
               )}
               <div className="total-amount-div">
                 <span className="section-text-gray">Ukupno:</span>
-                <span className="section-text-blue">{`${serviceCtx.serviceData.totalAmount.toFixed(
-                  2
-                )} €`}</span>
+                <span className="section-text-blue">{`${serviceCtx.serviceData.totalAmount
+                  .toFixed(2)
+                  .replace(".", ",")} €`}</span>
               </div>
               <div className="bg-div">
                 <label className="form-section-text">Kontakt podaci</label>
