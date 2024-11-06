@@ -3,7 +3,7 @@
 This is a simple React application powered by Vite for fast development and optimized build.
 
 ## Prerequisites
-- **Node.js** (v14 or later)
+- **Node.js** (v18.18 or later)
 - **npm** (Node package manager, comes with Node.js)
 - **yarn** - preferred manager
 
