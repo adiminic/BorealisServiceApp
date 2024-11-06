@@ -1,50 +1,36 @@
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple React application powered by Vite for fast development and optimized build.
 
-Currently, two official plugins are available:
+## Prerequisites
+Ensure you have the following installed:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Node.js (v14 or later)
+yarn (Node package manager, comes with Node.js)
 
-## Expanding the ESLint configuration
+Getting Started
+Clone the repository:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+bash
+git clone <repository-url>
+cd <project-name>
 
-- Configure the top-level `parserOptions` property like this:
+Install dependencies:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+bash
+yarn
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Run the development server:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+bash
+yarn dev
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Open the app:
+The app should now be running locally. Open http://localhost:5173 in your browser to view it.
+
+## Available Scripts
+In the project directory, you can run, preffered for this project is yarn:
+
+npm run dev or yarn dev: Starts the development server.
+npm run build or yarn build: Builds the app for production.
+npm run preview or yarn preview: Serves the built app for a local preview.
